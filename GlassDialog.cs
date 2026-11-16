@@ -1,0 +1,13 @@
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+
+namespace Voxlet;
+
+public static class GlassDialog
+{
+    public static bool Show(Window owner,string message,string title="Voxlet",bool confirm=false)
+    {
+        var window=new Window{Title=title,Owner=owner,Width=440,SizeToContent=SizeToContent.Height,WindowStartupLocation=WindowStartupLocation.CenterOwner,WindowStyle=WindowStyle.None,ResizeMode=ResizeMode.NoResize,ShowInTaskbar=false,Background=Brushes.Transparent,AllowsTransparency=true,Foreground=(Brush)Application.Current.Resources["PrimaryText"]};var root=new Border{Background=(Brush)Application.Current.Resources["GlassPanelFill"],BorderBrush=(Brush)Application.Current.Resources["GlassPanelEdge"],BorderThickness=new Thickness(1),CornerRadius=new CornerRadius(18),Padding=new Thickness(1),Margin=new Thickness(12)};var layout=new Grid();layout.RowDefinitions.Add(new RowDefinition{Height=new GridLength(38)});layout.RowDefinitions.Add(new RowDefinition{Height=GridLength.Auto});layout.RowDefinitions.Add(new RowDefinition{Height=GridLength.Auto});var head=new DockPanel{Margin=new Thickness(14,0,6,0),LastChildFill=true};head.Children.Add(new TextBlock{Text=title,FontWeight=FontWeights.SemiBold,VerticalAlignment=VerticalAlignment.Center});var close=new Button{Content="×",Width=30,Height=28,Padding=new Thickness(0),Background=Brushes.Transparent,BorderBrush=Brushes.Transparent};close.Click+=(_,_)=>{window.DialogResult=false;window.Close();};DockPanel.SetDock(close,Dock.Right);head.Children.Insert(0,close);layout.Children.Add(head);var body=new TextBlock{Text=message,TextWrapping=TextWrapping.Wrap,Margin=new Thickness(18,12,18,18),Foreground=(Brush)Application.Current.Resources["PrimaryText"]};Grid.SetRow(body,1);layout.Children.Add(body);var actions=new StackPanel{Orientation=Orientation.Horizontal,HorizontalAlignment=HorizontalAlignment.Right,Margin=new Thickness(12,0,14,14)};Button Make(string text,bool value,bool primary){var b=new Button{Content=text,Style=(Style)Application.Current.FindResource("AppButton"),MinWidth=84,Margin=new Thickness(7,0,0,0),IsDefault=primary,IsCancel=!confirm&&!primary};b.Click+=(_,_)=>{window.DialogResult=value;window.Close();};return b;}if(confirm){actions.Children.Add(Make("Cancel",false,false));actions.Children.Add(Make("Yes",true,true));}else actions.Children.Add(Make("OK",true,true));Grid.SetRow(actions,2);layout.Children.Add(actions);root.Child=layout;window.Content=root;window.PreviewKeyDown+=(_,e)=>{if(e.Key==System.Windows.Input.Key.Escape){window.DialogResult=false;window.Close();}};return window.ShowDialog()==true;
+    }
+}

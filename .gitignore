@@ -1,0 +1,9 @@
+bin/
+obj/
+.vs/
+graphify-out/
+publish/
+dist/
+Resources/Whisper/
+*.user
+*.suo
